@@ -1,3 +1,4 @@
+# ---------------------------------------------------------
 # StateSpace.jl
 # Types and functions for making State Space Time Series Models.
 #
@@ -10,13 +11,13 @@
 #     /Time Series Theory and Methods/, ch. 12
 #
 # C. Vogel     Nov 2013
-
+# ---------------------------------------------------------
 module StateSpaceModels
 
 typealias FP FloatingPoint
 
 abstract StateSpace
-# ---------------------------------------------------------
+
 # A *Linear State Space Model* has the form:
 #  
 #    y[t] = G * x[t] + v[t]
@@ -38,7 +39,6 @@ abstract StateSpace
 #
 # This matrix is (n+m)x(n+m), meaning S is an mxn
 # that reflects covariance between w an v -- E(w*v')
-# ---------------------------------------------------------
 immutable LinearStateSpace{T<:FP} <: StateSpace
     F::Union(T, Matrix{T})
     Q::Union(T, Matrix{T})
@@ -48,7 +48,7 @@ end
 
 # Hacking the Cholesky Decomposition to deal with
 # deterministic elements in the SS model:
-# ---------------------------------------------------------
+#
 # In some State Space models, elements of x or y can be
 # deterministic, meaning that the corresponding row of
 # w or v is deterministic (or has zero variance). 
@@ -72,7 +72,7 @@ end
 # decomposition won't be affected, and we can just
 # replace the diagonals we modified with zero in
 # the resulting decomposition matrix.
-# ---------------------------------------------------------
+
 
 # Let's just make a scalar version that mimics the square root.
 # This means we don't have to make a distinction between
