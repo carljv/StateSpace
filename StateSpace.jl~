@@ -285,7 +285,7 @@ y_sts = StateSpaceModels.simulate(sts, 200, x0)
 # to get a time series with trend and seasonal
 # components
 strts = tr + sts
-y_strts = StateSpaceModels.simulate(sts, 200, x0)
+y_strts = StateSpaceModels.simulate(sts, 200, x0
 
 
 
