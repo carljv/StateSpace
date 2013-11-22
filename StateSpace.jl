@@ -19,7 +19,7 @@ typealias FP FloatingPoint
 abstract StateSpace
 
 # A *Linear State Space Model* has the form:
-#  
+#
 #    y[t] = G * x[t] + v[t]
 #    x[t+1] = F * x[t] + w[t] ,
 #
@@ -51,7 +51,7 @@ end
 #
 # In some State Space models, elements of x or y can be
 # deterministic, meaning that the corresponding row of
-# w or v is deterministic (or has zero variance). 
+# w or v is deterministic (or has zero variance).
 # We can reflect this by:
 # (1) computing the random and deterministic parts of the
 # model separately (so, e.g. if x is nx1 with 1
@@ -105,7 +105,7 @@ end
 
 # Iterating the state over time
 # ---------------------------------------------
-# F, G, Q, R parameters are specified, the 
+# F, G, Q, R parameters are specified, the
 # following functions produce an iterator
 # that will generate a sequence of states
 # x[1], x[2], ... according to the state
@@ -120,7 +120,7 @@ function state_updater(ss::LinearStateSpace)
         newx = size(newx) == (1, 1) ? newx[1] : newx
         newx
     end
-    update 
+    update
 end
 
 function state_iterator(ss::LinearStateSpace, x)
@@ -138,7 +138,7 @@ function state_iterator(ss::LinearStateSpace, x)
 end
 
 
-# The observation function 
+# The observation function
 #    y[t] = G * x[t] + v[t], v[t] ~ N(0, R)
 # The result of obersver is a function that takes x[t],
 # as its argument, not the y[t] resulting from a specific x[t]
@@ -168,14 +168,14 @@ end
 # State Space Models can be summed or stacked.
 # The sum of two LSSMs is also an LSSM, as are two
 # stacked LSSMs.
-# e.g. if M1, and M2 are two LSSMS, denoted respectively, 
+# e.g. if M1, and M2 are two LSSMS, denoted respectively,
 # M1 = LSSM{F1, G1, Q1, R1}; M2 = LSSM{F2, G2, Q2, R2},
 # then M1 + M2 = LSSM{F12, G12, Q12, R12},
 # and [M1, M2]' = LSSM{F12*, G12*, Q12*, R12*}.
 #
 # These operation allow for abstract operations on the
 # models, to get new models.  This is an alternative
-# to performing operations on the 
+# to performing operations on the
 function blockdiag{T<:Number}(M::Matrix{T}, N::Matrix{T})
     rm = size(M, 1); cm = size(M, 2)
     rn = size(N, 1); cn = size(N, 2)
@@ -231,14 +231,12 @@ end
 end # module
 
 
-# --------------------------------------------------------- 
-# EXAMPLES
-# --------------------------------------------------------- 
-# !!! The following code doesn't work in this file. It
-# !!! needs to be moved to a new file that includes the
-# !!! StateSpaceModels module. This is just here for show.
+# ---------------------------------------------------------
+# EXAMPLES - just for illustration, not useful otherwise
 # ---------------------------------------------------------
 
+module StateSpaceExamples
+using StateSpaceModels
 # Varying linear trend model
 # z[t] = z[t-1] + b + s * e[t]; e[t] ~ N(0, 1)
 #
@@ -246,19 +244,19 @@ end # module
 # X[t] = [x[t], b]
 # X[t+1] = [1. 1.; 0 0] * X[t] + [s 0.; 0. 0.] * v[t+1]; v[t] ~ N(0, I_1)
 # Y[t] = [1. 0.] * X[t] + 0. * w[t]; w[t] ~ N(0, 1)
-#
+
 F = [1.  1.;
      0.  1.]
-     
-Q = [.5  0.;
+
+Q = [.25  0.;
      0.  0.]
 
 G = [1. 0.]
 R = .0
 
-x0 = [0., .1]
+x0_tr = [0., .5]
 tr = StateSpaceModels.LinearStateSpace(F, Q, G, R)
-y_tr = StateSpaceModels.simulate(tr, 200, x0)
+y_tr = StateSpaceModels.simulate(tr, 200, x0_tr)
 
 
 # Seasonal Time Series (noiseless) w/ period d=12
@@ -278,14 +276,14 @@ R1 = 0.
 
 sts = StateSpaceModels.LinearStateSpace(F1, Q1, G1, R1)
 
-x0 = randn(d-2)
-y_sts = StateSpaceModels.simulate(sts, 200, x0)
+x0_sts = randn(d-2) * 5
+y_sts = StateSpaceModels.simulate(sts, 200, x0_sts)
 
 # We can add the seaonsal model to the trend model
 # to get a time series with trend and seasonal
 # components
 strts = tr + sts
-y_strts = StateSpaceModels.simulate(sts, 200, x0)
+y_strts = StateSpaceModels.simulate(strts, 200, [x0_tr, x0_sts])
 
 
 
@@ -301,3 +299,5 @@ G2 = [1. 0.]
 R2 = 0.
 
 ar1 = StateSpaceModels.LinearStateSpace(F2, Q2, G2, R2)
+
+end # module
